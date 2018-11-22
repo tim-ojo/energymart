@@ -1,8 +1,10 @@
 package com.timojo.energymart.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.timojo.energymart.datasource.Accounts;
 import com.timojo.energymart.model.PricePlan;
 import com.timojo.energymart.model.Recommendation;
+import com.timojo.energymart.model.RecommendedPlan;
 import com.timojo.energymart.service.PricePlanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,34 +18,36 @@ import java.util.stream.Collectors;
 @RequestMapping("/plans")
 public class PricePlanComparatorController {
     private final PricePlanService pricePlanService;
-    private final ObjectMapper mapper;
+    private final Accounts accounts;
 
     @Autowired
-    public PricePlanComparatorController(PricePlanService pricePlanService, ObjectMapper mapper) {
+    public PricePlanComparatorController(PricePlanService pricePlanService, Accounts accounts) {
         this.pricePlanService = pricePlanService;
-        this.mapper = mapper;
+        this.accounts = accounts;
     }
 
     @GetMapping("/recommend/{accountId}")
-    public ResponseEntity<List<Recommendation>> recommendPricePlans(@PathVariable Integer accountId, @RequestParam(value = "limit", required = false) Integer limit) {
+    public ResponseEntity<Recommendation> recommendPricePlans(@PathVariable Integer accountId,
+                                                              @RequestParam(value = "limit", required = false) Integer limit) {
         Map<PricePlan, BigDecimal> consumptionCostForPricePlans = pricePlanService.get7DayCostOfElectricityForEachPricePlan(accountId);
 
         if ( consumptionCostForPricePlans.isEmpty() ) {
             return ResponseEntity.notFound().build();
         }
 
-        List<Recommendation> recommendations = consumptionCostForPricePlans.entrySet()
+        List<RecommendedPlan> recommendedPlans = consumptionCostForPricePlans.entrySet()
                 .stream()
-                .map(entry -> new Recommendation(entry.getKey().getEnergySupplier(), entry.getKey().getPlanName(),
+                .map(entry -> new RecommendedPlan(entry.getKey().getEnergySupplier(), entry.getKey().getPlanName(),
                         entry.getKey().getUnitRate(), entry.getKey().getRating(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        recommendations.sort(Comparator.comparing(Recommendation::getUsageCost));
+        recommendedPlans.sort(Comparator.comparing(RecommendedPlan::getUsageCost));
 
-        if (limit != null && limit < recommendations.size()) {
-            recommendations = recommendations.subList(0, limit);
+        if (limit != null && limit < recommendedPlans.size()) {
+            recommendedPlans = recommendedPlans.subList(0, limit);
         }
 
-        return ResponseEntity.ok(recommendations);
+        return ResponseEntity.ok(
+                new Recommendation(accounts.getAccount(accountId).getPlanId(), recommendedPlans));
     }
 }

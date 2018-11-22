@@ -1,48 +1,22 @@
 package com.timojo.energymart.model;
 
-import com.timojo.energymart.util.WeekHour;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 public class Recommendation {
-    private final String planName;
-    private final String energySupplier;
-    private final BigDecimal usageCost; // for the past 7 days
-    private final BigDecimal unitRate; // unit price per kWh
-    private final Double rating;
+    private String currentPlan;
+    private List<RecommendedPlan> recommendedPlans;
 
-    public Recommendation(String energySupplier, String planName, BigDecimal unitRate, Double rating,
-                          BigDecimal usageCost) {
-        this.energySupplier = energySupplier;
-        this.planName = planName;
-        this.unitRate = unitRate;
-        this.rating = rating;
-        this.usageCost = usageCost;
+    public Recommendation(String currentPlan, List<RecommendedPlan> recommendedPlans) {
+        this.currentPlan = currentPlan;
+        this.recommendedPlans = recommendedPlans;
     }
 
-    public String getPlanName() {
-        return planName;
+    public String getCurrentPlan() {
+        return currentPlan;
     }
 
-    public String getEnergySupplier() {
-        return energySupplier;
-    }
-
-    public BigDecimal getUsageCost() {
-        return usageCost;
-    }
-
-    public BigDecimal getUnitRate() {
-        return unitRate;
-    }
-
-    public Double getRating() {
-        return rating;
+    public List<RecommendedPlan> getRecommendedPlans() {
+        return recommendedPlans;
     }
 }
