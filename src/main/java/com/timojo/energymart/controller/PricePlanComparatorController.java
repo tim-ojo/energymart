@@ -1,6 +1,5 @@
 package com.timojo.energymart.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.timojo.energymart.datasource.Accounts;
 import com.timojo.energymart.model.PricePlan;
 import com.timojo.energymart.model.Recommendation;
