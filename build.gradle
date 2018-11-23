@@ -16,9 +16,13 @@ repositories {
 
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web:2.1.0.RELEASE'
+    compile 'org.springframework:spring-aspects:5.1.2.RELEASE'
 
     // enhanced Java Streams
     compile 'one.util:streamex:0.6.7'
+
+    // micrometer
+    compile("io.micrometer:micrometer-registry-jmx:latest.integration")
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
