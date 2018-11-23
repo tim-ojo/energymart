@@ -42,7 +42,8 @@ public class MeterReadingController {
     }
 
     @GetMapping("/read/{accountId}")
-    public ResponseEntity<List<ElectricityReading>> readReadings(@PathVariable Integer accountId, @RequestParam(value = "limit", required = false) Integer limit) {
+    public ResponseEntity<List<ElectricityReading>> readReadings(@PathVariable Integer accountId,
+                                                                 @RequestParam(value = "limit", required = false) Integer limit) {
         List<ElectricityReading> readings = meterReadingService.getReadings(accountId);
 
         if (readings.isEmpty()) {
