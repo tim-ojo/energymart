@@ -11,6 +11,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class PricePlan {
+    private static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
+
     private final String energySupplier;
     private final String planName;
     private final BigDecimal unitRate; // unit price per kWh
@@ -39,9 +41,10 @@ public class PricePlan {
     }
 
     public BigDecimal getPrice(BigDecimal reading, Instant instant) {
-        ZonedDateTime dateTime = instant.atZone(ZoneId.of("UTC"));
+        ZonedDateTime dateTime = instant.atZone(UTC_ZONE_ID);
+        int weekHour = WeekHour.fromDateTime(dateTime);
         Optional<OffPeakTimeMultiplier> offPeakTimeMultiplier = offPeakTimeMultipliers.stream()
-                .filter(multiplier -> multiplier.getHourOfWeek() == WeekHour.fromDateTime(dateTime))
+                .filter(multiplier -> multiplier.getHourOfWeek() == weekHour)
                 .findFirst();
 
         BigDecimal adjustedRate = offPeakTimeMultiplier.map(multiplier -> unitRate.multiply(multiplier.getMultiplier())).orElse(unitRate);
